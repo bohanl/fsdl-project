@@ -95,7 +95,7 @@ Non-trainable params: 0
 ## Results
 ---
 
-A comparison between *MySQL* estimates and *Model* estimates is shown below. ```Loss``` is the ```mean squared log error``` used for training, and ```Score``` is [explained variance score](https://scikit-learn.org/stable/modules/model_evaluation.html#explained-variance-score). ```Absolute`` is in terms of the number of rows.
+A comparison between *MySQL* estimates and *Model* estimates is shown below. ```Loss``` is the ```mean squared log error``` used for training, and ```Score``` is [explained variance score](https://scikit-learn.org/stable/modules/model_evaluation.html#explained-variance-score). ```Absolute``` is in terms of the number of rows.
 
 | Syntax      | Loss         | Mean Absolute  | Max Absolute  | Score        |
 | ----------- | -----------  | -----------    | -----------   | -----------  |
