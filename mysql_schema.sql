@@ -1,5 +1,7 @@
 /* TPCH MySQL schema */
 
+/* NOTE: this script does NOT contain index creations. */
+
 create table part
    (p_partkey             int                     not null primary key,
     p_name                varchar(55)             not null,
