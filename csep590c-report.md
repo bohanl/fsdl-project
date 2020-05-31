@@ -69,6 +69,7 @@ It's very expensive to analyze queries in MySQL when it has large number of rows
 
 ## 3. Model Setup
 
+* The model takes the concatenated vector described above as input and outputs a single number representing the cardinality of the query.
 * Dataset is split with ```60/20/20``` for training/validation/testing.
 * The deep learning model is set up to have ```3``` hidden layers with ```256``` nodes on each layer. In total, it has ```136,961``` trainable parameters. ```Adam``` optimizer is used with ```ReLU``` activation. ```Mean squared logarithmic error``` is used as the loss function.
 * The model is trained for ```1000``` episodes.
@@ -116,7 +117,7 @@ In this report, the ```SELECTION``` is normalized as <code>(val - min) / (max - 
 
 ### More Training Data
 
-It would be interesting to see how model performs with even training samples. It took over 24 hours for MySQL to analyze 3500+ queries with 500 threads on an 8-core laptop. When the model is built into the query optimizer, the model can be trained as queries come in or it can be pre-trained using a set of training data.
+It would be interesting to see how model performs with even training samples. It took over 24 hours for MySQL to analyze 3500+ queries with 500 threads on an 8-core laptop (This is IO intensive rather than CPU intensive). When the model is built into the query optimizer, the model can be trained as queries come in or it can be pre-trained using a set of training data.
 
 ### Feedback Loop
 
