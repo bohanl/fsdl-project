@@ -15,13 +15,14 @@ This project report shows that *supervised* deep learning techniques can be appl
 ---
 
 ### Source Database
-[TPC-H](http://www.tpc.org/tpch/) is an industry standard dataset for database benchmark. To introduce skewness, a [skewed version](https://www.microsoft.com/en-us/download/details.aspx?id=52430) of TPC-H is used to generate the dataset. For this report, a 1GB dataset is generated with random skewness to various columns across the dataset.
+[TPC-H](http://www.tpc.org/tpch/) is an industry standard dataset for database benchmark. To introduce skewness, a [skewed version](https://www.microsoft.com/en-us/download/details.aspx?id=52430) of TPC-H is used to generate the dataset. For this report, a 1GB dataset is generated with random skewness to various columns across the dataset. The schema of the dataset can be found [here](https://github.com/bohanl/fsdl-project/blob/master/mysql_schema.sql).
 
 ### Query Encoding and Labeling
 To have a simple but meaningful experiment, the input query is limited to *SELECTION-JOIN* style queries (*PROJECTION* doesn't affect the cardinality) **without** aggregations, and only conjunctions are used in the selection. Also, only one foreign key constraint is allowed between any of two relations. Thus, each query has the following format:
 ```
 SELECT * FROM t1 JOIN t2 ON ... JOIN t3 ON ... WHERE ... AND ... AND ...;
 ```
+A [random query generator tool](https://github.com/bohanl/fsdl-project/blob/master/tools/randgen.py) is used to generate queries with the above format. *SELECTIONS* are randomly chosen.
 
 #### Query Encoding
 Queries need to be encoded to be fed into the network, and the encoded input should be able to uniquely identify each query. Since all queries are limited to *SELECTION-JOIN* style, two concatenated vectors are used to encode each query:
@@ -41,7 +42,7 @@ WHERE o_custkey >= 5923.41
 | 1,0,1,1,0,0,0,0, | 0.5875,0,0,0,0,0.0395,0,0,0,0,0 |
 ```
 
-#### Labeling
+#### Annotation (Labeling)
 Since this is *supervised* training and MySQL is used for comparison, for each encoded input, both *estimated cardinality* from MySQL and the *actual* cardinality are collected (only the *actual* cardinality is used as label). The following SQL command is run per query and obtain these two values from a MySQL 8.0 database with skewness version of TPC-H dataset:
 ```
 mysql> EXPLAIN ANALYZE <sql_query>\G
@@ -56,6 +57,7 @@ EXPLAIN: -> Nested loop inner join  (cost=11243.96 rows=19043) (actual time=7.91
 
 1 row in set (1.30 sec)
 ```
+The annotation tool can be found [here](https://github.com/bohanl/fsdl-project/blob/master/tools/annotate.py). Note that it needs to connect to a MySQL database with schema and data described above. This tool reads the randomly generated queries and annotate each query with *MySQL estimated rows* and *Actual number of rows*.
 
 #### Result Dataset
 
