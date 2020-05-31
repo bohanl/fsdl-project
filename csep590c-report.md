@@ -104,9 +104,9 @@ A comparison between *MySQL* estimates and *Model* estimates is shown below. ```
 
 The model testing result can be visualized with the following two graphs:
 
-![](mysql.png)
+![](data/mysql.png)
 
-![](model.png)
+![](data/model.png)
 
 
 ## Future Improvements
