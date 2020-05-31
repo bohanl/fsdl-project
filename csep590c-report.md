@@ -1,7 +1,6 @@
 # Cardinality Estimate with Deep Learning
 
 ## Introduction
----
 
 In a database query optimizer, cardinality estimation has become critical to determine an optimal query plan. Most of commercial and  open source databases collect statistics using histograms with heuristics to estimate cardinality. However, this approach usually has the following problems:
 
@@ -12,7 +11,6 @@ In a database query optimizer, cardinality estimation has become critical to det
 This project report shows that *supervised* deep learning techniques can be applied to solve this problem and achieve a better cardinality estimate than MySQL.
 
 ## Prepare Data
----
 
 ### Source Database
 [TPC-H](http://www.tpc.org/tpch/) is an industry standard dataset for database benchmark. To introduce skewness, a [skewed version](https://www.microsoft.com/en-us/download/details.aspx?id=52430) of TPC-H is used to generate the dataset. For this report, a 1GB dataset is generated with random skewness to various columns across the dataset. The schema of the dataset can be found [here](https://github.com/bohanl/fsdl-project/blob/master/mysql_schema.sql).
@@ -70,7 +68,7 @@ As a result of previous steps, a result dataset of the following format is produ
 It's very expensive to analyze queries in MySQL when it has large number of rows. Due to the resource limitation, the whole dataset contains 3500+ entries.
 
 ## Model Setup
----
+
 * Dataset is split with ```60/20/20``` for training/validation/testing.
 * The deep learning model is set up to have ```3``` hidden layers with ```256``` nodes on each layer. In total, it has ```136,961``` trainable parameters. ```Adam``` optimizer is used with ```ReLU``` activation. ```Mean squared logarithmic error``` is used as the loss function.
 * The model is trained for ```1000``` episodes.
@@ -95,7 +93,6 @@ Non-trainable params: 0
 ```
 
 ## Results
----
 
 A comparison between *MySQL* estimates and *Model* estimates is shown below. ```Loss``` is the ```mean squared log error``` used for training, and ```Score``` is [explained variance score](https://scikit-learn.org/stable/modules/model_evaluation.html#explained-variance-score). ```Absolute``` is in terms of the number of rows.
 
@@ -112,7 +109,6 @@ The model testing result can be visualized with the following two graphs:
 
 
 ## Future Improvements
----
 
 ### Better Normalization
 
@@ -132,9 +128,7 @@ When this model is built into the query optimizer, another reinforcement learnin
 GROUP BY ... HAVING ...
 ```
 
-
 ## References
----
 
 * [An Empirical Analysis of Deep Learning for Cardinality Estimation](https://arxiv.org/pdf/1905.06425.pdf)
 * [Neo: A Learned Query Optimizer](http://www.vldb.org/pvldb/vol12/p1705-marcus.pdf)
