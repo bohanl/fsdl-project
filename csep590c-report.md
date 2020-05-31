@@ -3,11 +3,11 @@
 ## Introduction
 ---
 
-In a database query optimzer, cardinality estimation has become critical to determine an optimal query plan. Most of commercial and  open source databases collect statistics using histograms with hueristics to estimate cardinality. However, this approach usually has the following problems:
+In a database query optimizer, cardinality estimation has become critical to determine an optimal query plan. Most of commercial and  open source databases collect statistics using histograms with heuristics to estimate cardinality. However, this approach usually has the following problems:
 
-* Histograms and hueristics approach tends to require data to be unformaly distributed. This is usually not the case in real customer databases.
+* Histograms and heuristics approach tends to require data to be uniformly distributed. This is usually not the case in real customer databases.
 * These statistics usually do not capture the relationships among dependent columns without explicit instructions from users.
-* The estimation errors are always amplied as queries get more complex.
+* The estimation errors are always amplified as queries get more complex.
 
 This project report shows that *supervised* deep learning techniques can be applied to solve this problem and achieve a better cardinality estimate than MySQL.
 
@@ -18,7 +18,7 @@ This project report shows that *supervised* deep learning techniques can be appl
 [TPC-H](http://www.tpc.org/tpch/) is an industry standard dataset for database benchmark. To introduce skewness, a [skewed version](https://www.microsoft.com/en-us/download/details.aspx?id=52430) of TPC-H is used to generate the dataset. For this report, a 1GB dataset is generated with random skewness to various columns across the dataset.
 
 ### Query Encoding and Labeling
-To have a simple but meaningful experiment, the input query is limited to *SELECTION-JOIN* style queries (*PROJECTION* doesn't affect the cardinality) **without** aggregations, and only conjuctions are used in the selection. Also, only one foreigh key constraint is allowed between any of two relations. Thus, each query has the following format:
+To have a simple but meaningful experiment, the input query is limited to *SELECTION-JOIN* style queries (*PROJECTION* doesn't affect the cardinality) **without** aggregations, and only conjunctions are used in the selection. Also, only one foreign key constraint is allowed between any of two relations. Thus, each query has the following format:
 ```
 SELECT * FROM t1 JOIN t2 ON ... JOIN t3 ON ... WHERE ... AND ... AND ...;
 ```
@@ -114,7 +114,7 @@ The model testing result can be visualized with the following two graphs:
 
 ### Better Normalization
 
-In this report, the ```SELECTION``` is normalized as <code>(val - min) / (max - min)</code>, which assumes data is uniformaly distributed. This can be improved by utilizing the histrograms from MySQL statistics package for more accurate representation. That is - this model can be bootstrapped with the vanilla statistics package in any databases. This should yield a better result or make the model converges faster.
+In this report, the ```SELECTION``` is normalized as <code>(val - min) / (max - min)</code>, which assumes data is uniformly distributed. This can be improved by utilizing the histograms from MySQL statistics package for more accurate representation. That is, this model can be bootstrapped with the vanilla statistics package in any databases. This should yield a better result or make the model converges faster.
 
 ### More Training Data
 
@@ -122,7 +122,7 @@ It would be interesting to see how model performs with even training samples. It
 
 ### Feedback Loop
 
-When this model is built into the query optimizer, another reinforcement learning model can be attached to it. After a query is executed, the model can compare the model estimtes with the actual number of rows, and applies a credit policy model to achieve better model performance. This essentially creates a positive feedback loop.
+When this model is built into the query optimizer, another reinforcement learning model can be attached to it. After a query is executed, the model can compare the model estimates with the actual number of rows, and applies a credit policy model to achieve better model performance. This essentially creates a positive feedback loop.
 
 
 ## References
