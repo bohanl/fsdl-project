@@ -1,6 +1,6 @@
 # Cardinality Estimate with Deep Learning
 
-## I. Introduction
+## 1. Introduction
 
 In a database query optimizer, cardinality estimation has become critical to determine an optimal query plan. Most of commercial and  open source databases collect statistics using histograms with heuristics to estimate cardinality. However, this approach usually has the following problems:
 
@@ -10,19 +10,19 @@ In a database query optimizer, cardinality estimation has become critical to det
 
 This project report shows that *supervised* deep learning techniques can be applied to solve this problem and achieve a better cardinality estimate than MySQL.
 
-## II. Prepare Data
+## 2. Prepare Data
 
-### 1. Source Database
+### 2.1 Source Database
 [TPC-H](http://www.tpc.org/tpch/) is an industry standard dataset for database benchmark. To introduce skewness, a [skewed version](https://www.microsoft.com/en-us/download/details.aspx?id=52430) of TPC-H is used to generate the dataset. For this report, a 1GB dataset is generated with random skewness to various columns across the dataset. The schema of the dataset can be found [here](https://github.com/bohanl/fsdl-project/blob/master/mysql_schema.sql).
 
-### 2. Query Encoding and Labeling
+### 2.2 Query Encoding and Labeling
 To have a simple but meaningful experiment, the input query is limited to *SELECTION-JOIN* style queries (*PROJECTION* doesn't affect the cardinality) **without** aggregations, and only conjunctions are used in the selection. Also, only one foreign key constraint is allowed between any of two relations. Thus, each query has the following format:
 ```
 SELECT * FROM t1 JOIN t2 ON ... JOIN t3 ON ... WHERE ... AND ... AND ...;
 ```
 A [random query generator tool](https://github.com/bohanl/fsdl-project/blob/master/tools/randgen.py) is used to generate queries with the above format. *SELECTIONS* are randomly chosen.
 
-#### 2.1 Query Encoding
+#### 2.2.1 Query Encoding
 Queries need to be encoded to be fed into the network, and the encoded input should be able to uniquely identify each query. Since all queries are limited to *SELECTION-JOIN* style, two concatenated vectors are used to encode each query:
 ```
 vec1 := a positional bitmap of all relations appearing in joins.
@@ -40,7 +40,7 @@ WHERE o_custkey >= 5923.41
 | 1,0,1,1,0,0,0,0, | 0.5875,0,0,0,0,0.0395,0,0,0,0,0 |
 ```
 
-#### 2.2 Annotation (Labeling)
+#### 2.2.2 Annotation (Labeling)
 Since this is *supervised* training and MySQL is used for comparison, for each encoded input, both *estimated cardinality* from MySQL and the *actual* cardinality are collected (only the *actual* cardinality is used as label). The following SQL command is run per query and obtain these two values from a MySQL 8.0 database with skewness version of TPC-H dataset:
 ```
 mysql> EXPLAIN ANALYZE <sql_query>\G
@@ -57,7 +57,7 @@ EXPLAIN: -> Nested loop inner join  (cost=11243.96 rows=19043) (actual time=7.91
 ```
 The annotation tool can be found [here](https://github.com/bohanl/fsdl-project/blob/master/tools/annotate.py). Note that it needs to connect to a MySQL database with schema and data described above. This tool reads the randomly generated queries and annotate each query with *MySQL estimated rows* and *Actual number of rows*.
 
-#### 3. Result Dataset
+#### 2.3 Result Dataset
 
 As a result of previous steps, a result dataset of the following format is produced:
 ```
@@ -67,13 +67,13 @@ As a result of previous steps, a result dataset of the following format is produ
 ```
 It's very expensive to analyze queries in MySQL when it has large number of rows. Due to the resource limitation, the whole dataset contains 3500+ entries.
 
-## III. Model Setup
+## 3. Model Setup
 
 * Dataset is split with ```60/20/20``` for training/validation/testing.
 * The deep learning model is set up to have ```3``` hidden layers with ```256``` nodes on each layer. In total, it has ```136,961``` trainable parameters. ```Adam``` optimizer is used with ```ReLU``` activation. ```Mean squared logarithmic error``` is used as the loss function.
 * The model is trained for ```1000``` episodes.
 
-### Model Summary
+**Model Summary**
 ```
 Model: "sequential_6"
 _________________________________________________________________
@@ -92,7 +92,7 @@ Trainable params: 136,961
 Non-trainable params: 0
 ```
 
-## IV. Results
+## 4. Results
 
 A comparison between *MySQL* estimates and *Model* estimates is shown below. ```Loss``` is the ```mean squared log error``` used for training, and ```Score``` is [explained variance score](https://scikit-learn.org/stable/modules/model_evaluation.html#explained-variance-score). ```Absolute``` is in terms of the number of rows.
 
@@ -108,7 +108,7 @@ The model testing result can be visualized with the following two graphs:
 ![](data/model.png)
 
 
-## V. Future Improvements
+## 5. Future Improvements
 
 ### Better Normalization
 
@@ -116,7 +116,7 @@ In this report, the ```SELECTION``` is normalized as <code>(val - min) / (max - 
 
 ### More Training Data
 
-It would be interesting to see how model performs with even training samples. It took over 24 hours for MySQL to analyze 3500+ queries with 500 threads on an 8-core laptop. 
+It would be interesting to see how model performs with even training samples. It took over 24 hours for MySQL to analyze 3500+ queries with 500 threads on an 8-core laptop. When the model is built into the query optimizer, the model can be trained as queries come in or it can be pre-trained using a set of training data.
 
 ### Feedback Loop
 
@@ -129,7 +129,7 @@ GROUP BY ... HAVING ...
 ```
 
 ---
-## References
+**References**
 
 * [An Empirical Analysis of Deep Learning for Cardinality Estimation](https://arxiv.org/pdf/1905.06425.pdf)
 * [Neo: A Learned Query Optimizer](http://www.vldb.org/pvldb/vol12/p1705-marcus.pdf)
