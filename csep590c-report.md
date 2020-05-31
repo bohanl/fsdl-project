@@ -126,6 +126,12 @@ It would be interesting to see how model performs with even training samples. It
 
 When this model is built into the query optimizer, another reinforcement learning model can be attached to it. After a query is executed, the model can compare the model estimates with the actual number of rows, and applies a credit policy model to achieve better model performance. This essentially creates a positive feedback loop.
 
+### Support Aggregations
+
+```
+GROUP BY ... HAVING ...
+```
+
 
 ## References
 ---
