@@ -65,7 +65,7 @@ As a result of previous steps, a result dataset of the following format is produ
 
 | 1,0,1,1,0,0,0,0, | 0.5875,0,0,0,0,0.0395,0,0,0,0,0 | MySQL Estimated | Actual |
 ```
-It's very expensive to analyze queries in MySQL when it has large number of rows. Due to the resource limitation, the whole dataset contains 3500+ entries.
+It's very expensive to analyze queries in MySQL when it has large number of rows. Due to the resource limitation, only 3500+ samples are collected.
 
 ## 3. Model Setup
 
