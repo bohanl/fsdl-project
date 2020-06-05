@@ -28,7 +28,7 @@ Queries need to be encoded to be fed into the network, and the encoded input sho
 vec1 := a positional bitmap of all relations appearing in joins.
 vec2 := a positional vector of numeric selection conditions.
 ```
-Thus, <code>vec1</code> has a length of 8 since TPC-H dataset contains 8 relations, and <code>vec2</code> has a length of 11 since the entire dataset has 11 numeric columns. Note that the model can be generalized to any type of columns. The selections are normalized as <code>(val - min) / (max - min)</code> (the min and max of all numeric columns are hand-collected). The following is an example of the original query and encoded input:
+Thus, <code>vec1</code> has a length of 8 since TPC-H dataset contains 8 relations, and <code>vec2</code> has a length of 11 since the entire dataset has 11 numeric columns. Note that the model can be generalized to any type of columns. The selections are normalized as <code>1 - (val - min) / (max - min)</code> (the min and max of all numeric columns are hand-collected). The following is an example of the original query and encoded input:
 ```
 SELECT *
 FROM orders
@@ -125,7 +125,7 @@ The model testing result can be visualized with the following two graphs:
 
 ### Better Normalization
 
-In this report, the ```SELECTION``` is normalized as <code>(val - min) / (max - min)</code>, which assumes data is uniformly distributed. This can be improved by utilizing the histograms from MySQL statistics package for more accurate representation. That is, this model can be bootstrapped with the vanilla statistics package in any databases. This should yield a better result or make the model converges faster.
+In this report, the ```SELECTION``` is normalized as <code>1 - (val - min) / (max - min)</code>, which assumes data is uniformly distributed. This can be improved by utilizing the histograms from MySQL statistics package for more accurate representation. That is, this model can be bootstrapped with the vanilla statistics package in any databases. This should yield a better result or make the model converges faster.
 
 ### More Training Data
 

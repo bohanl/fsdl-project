@@ -118,7 +118,7 @@ def generate_query(rel, n_rels):
         param = random.uniform(cond.start, cond.end)
         where.append("{} >= {:0.2f}".format(cond.col, param))
         percent = round((param - cond.start) / (cond.end - cond.start), 4)
-        conds.append((cond, percent,))
+        conds.append((cond, (1. - percent),))
     if where:
         query += (" WHERE " + " AND ".join(where))
     query += ";"
