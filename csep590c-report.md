@@ -69,6 +69,7 @@ It's very expensive to analyze queries in MySQL when it has large number of rows
 
 ## 3. Model Setup
 
+### Deep Learning Model
 * The model takes the concatenated vector described above as input and outputs a single number representing the cardinality of the query.
 * Dataset is split with ```60/20/20``` for training/validation/testing.
 * The deep learning model is set up to have ```3``` hidden layers with ```256``` nodes on each layer. In total, it has ```136,961``` trainable parameters. ```Adam``` optimizer is used with ```ReLU``` activation. ```Mean squared logarithmic error``` is used as the loss function.
@@ -93,20 +94,31 @@ Trainable params: 136,961
 Non-trainable params: 0
 ```
 
+### Emsembled Trees (AdaBoost)
+
+```
+AdaBoostRegressor(
+    base_estimator=DecisionTreeRegressor(max_leaf_nodes=256,),
+    n_estimators=500)
+```
+
 ## 4. Results
 
-A comparison between *MySQL* estimates and *Model* estimates is shown below. ```Loss``` is the ```mean squared log error``` used for training, and ```Score``` is [explained variance score](https://scikit-learn.org/stable/modules/model_evaluation.html#explained-variance-score). ```Absolute``` is in terms of the number of rows.
+A comparison between *MySQL* estimates, *Model* estimates, and *AdaBoost* estimates is shown below. ```Loss``` is the ```mean squared log error``` used for training, and ```Score``` is [explained variance score](https://scikit-learn.org/stable/modules/model_evaluation.html#explained-variance-score). ```Absolute``` is in terms of the number of rows.
 
 | Syntax      | Loss         | Mean Absolute  | Max Absolute  | Score        |
 | ----------- | -----------  | -----------    | -----------   | -----------  |
 | MySQL       | 1.158        | 84589.64       | 3293921       | 0.52149      |
 | Model       | 0.534        | 12939.16       | 1757615       | 0.97745      |
+| AdaBoost    | 2.887        | 16051.04       | 1399431       | 0.97158      |
 
 The model testing result can be visualized with the following two graphs:
 
 ![](data/mysql.png)
 
 ![](data/model.png)
+
+![](data/ada.png)
 
 
 ## 5. Future Improvements
